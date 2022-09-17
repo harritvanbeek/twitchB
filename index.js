@@ -3,6 +3,7 @@
 
 require('dotenv').config();
 const fs                =   require('fs');
+const http              =   require('http');
 const tmi               =   require('tmi.js');
 
 //require                 =   require("esm")(module/*, options */)
@@ -26,9 +27,20 @@ client.on('message', (channel, tags, message, self) => {
     if(self) return;
     
     //boodstrap
-    const data                = message.split(process.env.PRIFIX)[1];
+    const getdata               = message.split(process.env.PRIFIX)[1];
+    const data                  = getdata.split(' ')[0];
+    
+    console.log(data);
+
+
     if(!data) return;
-    const commandFiles      = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-    const command           = require(`./commands/${data}`);  
-    command.execude(client, channel, tags, message);      
+    const commandFiles      = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));    
+    for(const file of commandFiles) {
+        if(`${data}.js` === file){
+            const command           = require(`./commands/${file}`);  
+            command.execude(client, channel, tags, message);              
+        }
+    }
+
+
 });
